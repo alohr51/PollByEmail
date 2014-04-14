@@ -23,8 +23,8 @@ import javax.mail.search.FlagTerm;
 public class PollTally {
 
 	//configure
-	String emailUserName = "username";
-	String password = "password";
+	String emailUserName = "trainingmethodspoll";
+	String password = "Lost4815";
 	//end configure
 	ArrayList<Integer> q1 = new ArrayList<Integer>();
 	ArrayList<Integer> q2 = new ArrayList<Integer>();
@@ -34,7 +34,8 @@ public class PollTally {
 	ArrayList<Integer> q6 = new ArrayList<Integer>();
 	boolean isDone = false;
 	int badInput = 0;
-
+	
+	//continuously called to check for end condition ("End" in email subject)
 	public void testEnd(Folder inbox){        
 		try {
 			FlagTerm ft = new FlagTerm(new Flags(Flags.Flag.SEEN), false);
@@ -46,6 +47,7 @@ public class PollTally {
 					if("End".equals(subject)){
 						analyzeStats(inbox);
 						isDone = true;
+						System.out.println("DONE");
 					}
 					else{
 						System.out.println("Waiting on responses");
@@ -110,16 +112,8 @@ public class PollTally {
 		ArrayList<ArrayList<Integer>> rawData = new ArrayList<ArrayList<Integer>>();
 		rawData = addTallys(inbox);
 		createStats c = new createStats(rawData);
-		System.out.println(c.mostTopRatings());
+		System.out.println(c.mostLowRatings());
 		
-	}
-
-
-	public static void printQuestions(List<Integer> a){
-		for(int i = 0; i<a.size();i++){
-			System.out.print(a.get(i)+", ");
-		}
-		System.out.println();
 	}
 
 	public static void main(String args[]) {
@@ -129,8 +123,11 @@ public class PollTally {
 		try {
 			Session session = Session.getDefaultInstance(props, null);
 			Store store = session.getStore("imaps");
-			// IMAP host for yahoo.
-			store.connect("imap.mail.yahoo.com", "trainingmethodspoll", "Lost4815");
+			// IMAP for Yahoo.
+			store.connect("imap.mail.yahoo.com", reader.emailUserName, reader.password);
+			
+			//IMAP for Gmail
+            //store.connect("imap.gmail.com", "<username>", "<password>");
 			
 			final Folder inbox = store.getFolder("Inbox");
 			inbox.open(Folder.READ_ONLY);
